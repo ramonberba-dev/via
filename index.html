@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Via</title>
+<meta name="description" content="A pequena via do seu dia">
+<meta name="theme-color" content="#0F6E56">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" href="icons/favicon.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Via">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,500;1,6..72,400&family=Inter:wght@400;500&display=swap">
+<style>
+:root{--bg:#E1F5EE;--fg:#04342C;--muted:#0F6E56;--btn:#0F6E56;--btn-fg:#fff;--card:#ffffffcc}
+@media (prefers-color-scheme:dark){:root{--bg:#04342C;--fg:#E1F5EE;--muted:#9FE1CB;--btn:#5DCAA5;--btn-fg:#04342C;--card:#08504199}}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;background:var(--bg);color:var(--fg);font-family:Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+body{min-height:100dvh;display:grid;place-items:center;padding:max(24px,env(safe-area-inset-top)) max(20px,env(safe-area-inset-right)) max(24px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left))}
+main{width:100%;max-width:400px;display:grid;gap:18px;justify-items:center;text-align:center}
+.logo{width:112px;height:112px;border-radius:26px;box-shadow:0 10px 30px rgba(4,52,44,.18)}
+h1{font-family:Newsreader,Georgia,serif;font-weight:500;font-size:2.6rem;margin:0;letter-spacing:.02em}
+.sub{margin:-10px 0 0;color:var(--muted)}
+.btn{display:block;width:100%;border:0;border-radius:14px;background:var(--btn);color:var(--btn-fg);font:inherit;font-weight:500;font-size:1.05rem;padding:15px;text-decoration:none;cursor:pointer}
+.sec{background:transparent;color:var(--fg);border:1px solid currentColor;opacity:.85}
+.card{width:100%;background:var(--card);border-radius:16px;padding:16px 18px;text-align:left;font-size:.95rem;line-height:1.55}
+.card ol{margin:6px 0 0;padding-left:20px}
+.frase{font-family:Newsreader,Georgia,serif;font-style:italic;color:var(--muted);margin:6px 0 0}
+.frase b{display:block;font-style:normal;font-family:Inter,sans-serif;font-weight:500;font-size:.72rem;letter-spacing:.08em;margin-top:2px}
+[hidden]{display:none!important}
+.pulso{animation:p 1.4s ease-in-out infinite}
+@keyframes p{50%{opacity:.55}}
+@media (prefers-reduced-motion:reduce){.pulso{animation:none}}
+</style>
+</head>
+<body>
+<main>
+  <img class="logo" id="logo" src="icons/icon-512.png" alt="Logo do Via: uma trilha tracejada">
+  <h1>Via</h1>
+  <p class="sub" id="sub">A pequena via do seu dia</p>
+
+  <a class="btn" id="abrir" href="#">Abrir o Via</a>
+
+  <section class="card" id="instalar" hidden>
+    <strong>Coloque o Via na tela inicial</strong>
+    <button class="btn" id="instalar-btn" type="button" style="margin-top:10px" hidden>Instalar o Via</button>
+    <div id="ios" hidden>
+      No iPhone, pelo Safari:
+      <ol><li>Toque em <b>Compartilhar</b> (o quadrado com a seta para cima).</li><li>Escolha <b>Adicionar à Tela de Início</b>.</li><li>Toque em <b>Adicionar</b>.</li></ol>
+    </div>
+    <div id="android" hidden>
+      No Android, pelo Chrome: toque nos <b>três pontinhos</b> e em <b>Adicionar à tela inicial</b> (ou <b>Instalar app</b>).
+    </div>
+  </section>
+
+  <p class="frase">“Minha vocação é o amor.”<b>SANTA TERESINHA · A PEQUENA VIA</b></p>
+</main>
+<script>
+(() => {
+  "use strict";
+  const VIA = "https://claude.ai/artifact/AsZS1oSBqXVwJnfNLvyJpS";
+  const $ = id => document.getElementById(id);
+  $("abrir").href = VIA;
+  const instalado = matchMedia("(display-mode: standalone)").matches || navigator.standalone === true;
+  if ("serviceWorker" in navigator) navigator.serviceWorker.register("sw.js").catch(() => {});
+  if (instalado) {
+    $("sub").textContent = "Abrindo o seu dia…"; $("logo").classList.add("pulso");
+    setTimeout(() => location.replace(VIA), 350);
+    return;
+  }
+  $("instalar").hidden = false;
+  const ua = navigator.userAgent;
+  if (/iPhone|iPad|iPod/i.test(ua)) $("ios").hidden = false; else $("android").hidden = false;
+  let aviso = null;
+  addEventListener("beforeinstallprompt", e => { e.preventDefault(); aviso = e; $("instalar-btn").hidden = false; });
+  $("instalar-btn").addEventListener("click", async () => { if (!aviso) return; aviso.prompt(); await aviso.userChoice.catch(() => {}); aviso = null; $("instalar-btn").hidden = true; });
+  addEventListener("appinstalled", () => { $("instalar").hidden = true; });
+})();
+</script>
+</body>
+</html>
